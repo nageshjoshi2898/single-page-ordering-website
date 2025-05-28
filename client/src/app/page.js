@@ -4,33 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/navbar";
 import ProductCard from "@/components/ProductCard";
+import { useProducts } from "./context/ProductContext";
 
-const products = [
-  {
-    id: 1,
-    title: "Converse Sneakers",
-    description: "High Top (Lemon Yellow)",
-    price: 60,
-    image:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1080&q=80",
-    colors: ["#facc15", "#ef4444", "#3b82f6", "#1f2937"], // yellow, red, blue, black
-  },
-  {
-    id: 2,
-    title: "Nike Air Max",
-    description: "Low Top (White)",
-    price: 120,
-    image:
-      "https://images.unsplash.com/photo-1593032465171-8e9f9690c83f?auto=format&fit=crop&w=1080&q=80",
-    colors: ["#ffffff", "#000000"],
-  },
-];
 export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
   const router = useRouter();
-
+  const { products } = useProducts();
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -77,9 +58,9 @@ export default function ProductsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
         {products.map((product) => (
           <ProductCard
-            key={product.id}
+            key={product._id}
             product={product}
-            onAddToCart={()=>{}}
+            onAddToCart={() => {}}
           />
         ))}
       </div>

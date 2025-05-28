@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useRef
-} from "react";
+import { getToken } from "@/lib/localStore";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 
 const ProductContext = createContext();
 
@@ -17,6 +12,7 @@ export const ProductProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [cart, setCart] = useState([]);
 
@@ -40,12 +36,19 @@ export const ProductProvider = ({ children }) => {
         const params = new URLSearchParams({
           q: searchQuery,
           page: String(page),
-          limit: String(limit)
+          limit: String(limit),
         });
-
-        const res = await fetch(`${baseURL}/products?${params.toString()}`);
+        const token = getToken();
+        const res = await fetch(`${baseURL}/products?${params.toString()}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // <-- add token here
+          },
+        });
         const data = await res.json();
-        setProducts(data);
+        setProducts(data?.products);
+        setTotalPages(data?.pages)
       } catch (err) {
         console.error("Fetch failed:", err);
         setProducts([]);
@@ -77,13 +80,14 @@ export const ProductProvider = ({ children }) => {
         searchQuery,
         page,
         limit,
+        totalPages,
         cart,
         addToCart,
         removeFromCart,
         clearCart,
         setSearchQueryDebounced,
         setPageDebounced,
-        setLimitDebounced
+        setLimitDebounced,
       }}
     >
       {children}

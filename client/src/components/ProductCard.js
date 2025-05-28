@@ -6,33 +6,23 @@ export default function ProductCard({ product, onAddToCart }) {
       <div>
         <img
           className="object-cover h-64 w-full"
-          src={product.image}
-          alt={product.title}
+          src={product["Image Src"]}
+          alt={product.Title}
         />
       </div>
 
       <div className="flex flex-col gap-1 mt-4 px-4">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-50">
-          {product.title}
+          {product.Title || "Unknown"}
         </h2>
         <span className="font-normal text-gray-600 dark:text-gray-300">
           {product.description}
         </span>
         <span className="font-semibold text-gray-800 dark:text-gray-50">
-          ${product.price}
+          ${product["Variant Price"]}
         </span>
       </div>
 
-      <div className="flex gap-4 mt-4 px-4">
-        {product.colors.map((color, idx) => (
-          <button
-            key={idx}
-            aria-label={color}
-            className={`p-1 border border-gray-200 dark:border-gray-500 rounded-full cursor-pointer`}
-            style={{ backgroundColor: color }}
-          ></button>
-        ))}
-      </div>
 
       <div className="mt-4 p-4 border-t border-gray-200 dark:border-gray-500">
         <button
