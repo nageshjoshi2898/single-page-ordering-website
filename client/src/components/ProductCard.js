@@ -21,6 +21,9 @@ export default function ProductCard({ product, onAddToCart }) {
         <span className="font-semibold text-gray-800 dark:text-gray-50">
           ${product["Variant Price"]}
         </span>
+        <span className="font-semibold text-gray-800 dark:text-gray-50">
+          Vairant SKU {product["Variant SKU"]}
+        </span>
       </div>
 
 
