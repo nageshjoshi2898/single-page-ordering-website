@@ -1,0 +1,1 @@
+mongoimport --uri "<mongo_db_uri>" --collection products --file data.json --jsonArray
