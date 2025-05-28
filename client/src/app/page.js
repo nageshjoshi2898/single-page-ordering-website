@@ -3,13 +3,28 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/navbar";
+import ProductCard from "@/components/ProductCard";
 
-const dummyProducts = [
-  { id: 1, name: "Product A", price: "$10", image: "/product-a.jpg" },
-  { id: 2, name: "Product B", price: "$20", image: "/product-b.jpg" },
-  { id: 3, name: "Product C", price: "$15", image: "/product-c.jpg" },
+const products = [
+  {
+    id: 1,
+    title: "Converse Sneakers",
+    description: "High Top (Lemon Yellow)",
+    price: 60,
+    image:
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1080&q=80",
+    colors: ["#facc15", "#ef4444", "#3b82f6", "#1f2937"], // yellow, red, blue, black
+  },
+  {
+    id: 2,
+    title: "Nike Air Max",
+    description: "Low Top (White)",
+    price: 120,
+    image:
+      "https://images.unsplash.com/photo-1593032465171-8e9f9690c83f?auto=format&fit=crop&w=1080&q=80",
+    colors: ["#ffffff", "#000000"],
+  },
 ];
-
 export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -26,9 +41,6 @@ export default function ProductsPage() {
     }
   }, []);
 
-  const filteredProducts = dummyProducts.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  );
 
   if (loading) {
     return (
@@ -63,22 +75,12 @@ export default function ProductsPage() {
       <Navbar onSearch={setSearch} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
-        {filteredProducts.map((product) => (
-          <div
+        {products.map((product) => (
+          <ProductCard
             key={product.id}
-            className="bg-white p-4 rounded shadow hover:shadow-lg transition"
-          >
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-40 object-cover rounded mb-4"
-            />
-            <h3 className="text-lg font-semibold">{product.name}</h3>
-            <p className="text-gray-700">{product.price}</p>
-            <button className="mt-2 w-full bg-blue-500 text-white py-1 rounded hover:bg-blue-600">
-              Add to Cart
-            </button>
-          </div>
+            product={product}
+            onAddToCart={()=>{}}
+          />
         ))}
       </div>
     </div>

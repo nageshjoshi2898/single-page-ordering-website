@@ -8,15 +8,33 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Dummy login validation — replace with API call
-    if (email === "admin@example.com" && password === "password") {
-      localStorage.setItem("token", "dummy-token");
-      router.replace("/products");
-    } else {
-      alert("Invalid credentials");
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+    try {
+      const response = await fetch(`${baseURL}/auth/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Invalid credentials');
+      }
+  
+      const data = await response.json();
+  
+      // Store token (adjust based on your API response)
+      localStorage.setItem('token', data.token);
+  
+      // Redirect
+      router.replace('/');
+    } catch (err) {
+      alert(err.message);
     }
   };
 
