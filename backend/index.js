@@ -19,7 +19,6 @@ app.use(
 // Routes
 app.use("/api/auth", authRoutes);
 
-//TODO: Verify and fix auth middleware
 app.use("/api/products", auth, productRoutes);
 
 // Start server
