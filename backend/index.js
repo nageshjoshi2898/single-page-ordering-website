@@ -12,8 +12,8 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN, // or use '*' for development only
-    credentials: true, // if you're using cookies or auth headers
+    origin: "*",
+    credentials: true // if you're using cookies or auth headers
   })
 );
 // Routes
