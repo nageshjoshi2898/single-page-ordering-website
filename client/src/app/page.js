@@ -2,16 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/Navbar";
 import ProductCard from "@/components/ProductCard";
 import { useProducts } from "./context/ProductContext";
+import Pagination from "@/components/Pagination";
 
 export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
   const router = useRouter();
-  const { products } = useProducts();
+  const { products, page, limit, setPage, total } = useProducts();
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -21,7 +22,6 @@ export default function ProductsPage() {
       setLoading(false);
     }
   }, []);
-
 
   if (loading) {
     return (
@@ -56,7 +56,7 @@ export default function ProductsPage() {
       <Navbar onSearch={setSearch} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
-        {products.map((product) => (
+        {products?.map((product) => (
           <ProductCard
             key={product._id}
             product={product}
@@ -64,6 +64,13 @@ export default function ProductsPage() {
           />
         ))}
       </div>
+
+      <Pagination
+        currentPage={page}
+        totalItems={total}
+        itemsPerPage={limit}
+        onPageChange={setPage}
+      />
     </div>
   );
 }

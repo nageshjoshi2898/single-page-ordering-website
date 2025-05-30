@@ -1,10 +1,15 @@
-"use client"
+"use client";
 import { useState } from "react";
-import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import {
+  ShoppingCartIcon,
+  ArrowRightEndOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 import CartDrawer from "./CartDrawer";
 import { useProducts } from "@/app/context/ProductContext";
+import { useRouter } from "next/navigation";
 
 export default function Navbar({ onSearch }) {
+  const router = useRouter();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { setSearchQueryDebounced } = useProducts();
   return (
@@ -32,9 +37,16 @@ export default function Navbar({ onSearch }) {
           >
             <ShoppingCartIcon className="w-6 h-6 text-gray-700" />
           </button>
-          {/* <button onClick={onLoginClick} className="hover:text-blue-600">
-          <ArrowRightEndOnRectangleIcon className="w-6 h-6 text-gray-700" />
-        </button>
+          <button
+            onClick={() => {
+              const token = localStorage.removeItem("token");
+              router.replace("/login");
+            }}
+            className="hover:text-blue-600"
+          >
+            <ArrowRightEndOnRectangleIcon className="w-6 h-6 text-gray-700" />
+          </button>
+          {/* 
         <button onClick={onLogoutClick} className="hover:text-blue-600">
           <ChatBubbleBottomCenterIcon className="w-6 h-6 text-gray-700 rotate-180" />
         </button> */}

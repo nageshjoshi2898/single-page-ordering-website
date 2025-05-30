@@ -17,9 +17,12 @@ app.use(
   })
 );
 // Routes
+app.get("/", (req, res) => {
+  res.send("Backend is deployed and running ✅");
+});
+
 app.use("/api/auth", authRoutes);
 
-//TODO: Verify and fix auth middleware
 app.use("/api/products", auth, productRoutes);
 
 // Start server
