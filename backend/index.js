@@ -17,6 +17,10 @@ app.use(
   })
 );
 // Routes
+app.get("/", (req, res) => {
+  res.send("Backend is deployed and running ✅");
+});
+
 app.use("/api/auth", authRoutes);
 
 app.use("/api/products", auth, productRoutes);
