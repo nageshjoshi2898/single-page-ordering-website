@@ -13,7 +13,7 @@ export const ProductProvider = ({ children }) => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [totalPages, setTotalPages] = useState(0);
-
+  const [total, setTotal] = useState(0);
   const [cart, setCart] = useState([]);
 
   const debounceTimeout = useRef(null);
@@ -49,9 +49,11 @@ export const ProductProvider = ({ children }) => {
         const data = await res.json();
         setProducts(data?.products);
         setTotalPages(data?.pages)
+        setTotal(data?.total)
       } catch (err) {
         console.error("Fetch failed:", err);
         setProducts([]);
+        setTotal(0)
       } finally {
         setLoading(false);
       }
@@ -79,9 +81,11 @@ export const ProductProvider = ({ children }) => {
         loading,
         searchQuery,
         page,
+        setPage,
         limit,
         totalPages,
         cart,
+        total,
         addToCart,
         removeFromCart,
         clearCart,
