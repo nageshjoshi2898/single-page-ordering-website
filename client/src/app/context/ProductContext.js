@@ -1,5 +1,6 @@
 "use client";
 
+import useDebouncedCartSync from "@/customHooks/useDebounceCartSync";
 import { getToken } from "@/lib/localStore";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 
@@ -14,8 +15,9 @@ export const ProductProvider = ({ children }) => {
   const [limit, setLimit] = useState(20);
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
-  const [cart, setCart] = useState([]);
-
+  const [cart, setCart] =  useState([]);
+  
+  useDebouncedCartSync(cart);
   const debounceTimeout = useRef(null);
 
   const debounce = (fn) => {
@@ -48,12 +50,12 @@ export const ProductProvider = ({ children }) => {
         });
         const data = await res.json();
         setProducts(data?.products);
-        setTotalPages(data?.pages)
-        setTotal(data?.total)
+        setTotalPages(data?.pages);
+        setTotal(data?.total);
       } catch (err) {
         console.error("Fetch failed:", err);
         setProducts([]);
-        setTotal(0)
+        setTotal(0);
       } finally {
         setLoading(false);
       }
@@ -61,17 +63,50 @@ export const ProductProvider = ({ children }) => {
 
     fetchProducts();
   }, [searchQuery, page, limit]);
-
   const addToCart = (item) => {
-    setCart((prev) => [...prev, item]);
+    setCart((prevCart) => {
+      const existingItemIndex = prevCart.findIndex(
+        (cartItem) => cartItem.id === item.id
+      );
+
+      if (existingItemIndex !== -1) {
+        const updatedCart = [...prevCart];
+        updatedCart[existingItemIndex] = {
+          ...updatedCart[existingItemIndex],
+          qty: updatedCart[existingItemIndex].qty + 1,
+        };
+        return updatedCart;
+      } else {
+        return [...prevCart, { ...item, qty: 1 }];
+      }
+    });
   };
 
   const removeFromCart = (id) => {
-    setCart((prev) => prev.filter((p) => p.id !== id));
+    setCart((prev) => prev.filter((p) => p._id !== id));
   };
 
   const clearCart = () => {
     setCart([]);
+  };
+
+  const increaseQty = (itemId) => {
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item._id === itemId ? { ...item, qty: item.qty + 1 } : item
+      )
+    );
+  };
+
+  const decreaseQty = (itemId) => {
+    setCart(
+      (prevCart) =>
+        prevCart
+          .map((item) =>
+            item._id === itemId ? { ...item, qty: item.qty - 1 } : item
+          )
+          .filter((item) => item.qty > 0) // Remove item if qty becomes 0
+    );
   };
 
   return (
@@ -92,6 +127,8 @@ export const ProductProvider = ({ children }) => {
         setSearchQueryDebounced,
         setPageDebounced,
         setLimitDebounced,
+        decreaseQty,
+        increaseQty,
       }}
     >
       {children}

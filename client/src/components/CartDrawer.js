@@ -1,27 +1,9 @@
 import React from "react";
-
-const cartItems = [
-  {
-    id: 1,
-    name: "Throwback Hip Bag",
-    color: "Salmon",
-    price: 90.0,
-    qty: 1,
-    image:
-      "https://tailwindcss.com/plus-assets/img/ecommerce-images/shopping-cart-page-04-product-01.jpg",
-  },
-  {
-    id: 2,
-    name: "Medium Stuff Satchel",
-    color: "Blue",
-    price: 32.0,
-    qty: 1,
-    image:
-      "https://tailwindcss.com/plus-assets/img/ecommerce-images/shopping-cart-page-04-product-02.jpg",
-  },
-];
+import { useProducts } from "@/app/context/ProductContext";
+import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 export default function CartDrawer({ open, onClose }) {
+  const { cart, removeFromCart, decreaseQty, increaseQty } = useProducts();
   return (
     <>
       {/* Backdrop */}
@@ -80,12 +62,12 @@ export default function CartDrawer({ open, onClose }) {
             <div className="mt-8">
               <div className="flow-root">
                 <ul role="list" className="-my-6 divide-y divide-gray-200">
-                  {cartItems.map((item) => (
-                    <li key={item.id} className="flex py-6">
+                  {cart?.map((item) => (
+                    <li key={item._id} className="flex py-6">
                       <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                         <img
-                          src={item.image}
-                          alt={item.name}
+                          src={item["Image Src"]}
+                          alt={item.Title}
                           className="h-full w-full object-cover object-center"
                         />
                       </div>
@@ -93,21 +75,39 @@ export default function CartDrawer({ open, onClose }) {
                         <div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                             <h3>
-                              <a href="#">{item.name}</a>
+                              <a href="#">{item.Title}</a>
                             </h3>
-                            <p className="ml-4">${item.price.toFixed(2)}</p>
+                            <p className="ml-4">
+                              ${item["Variant Price"].toFixed(2)}
+                            </p>
                           </div>
                           <p className="mt-1 text-sm text-gray-500">
-                            {item.color}
+                            {item["Variant SKU"]}
                           </p>
                         </div>
                         <div className="flex flex-1 items-end justify-between text-sm">
-                          <p className="text-gray-500">Qty {item.qty}</p>
+                          <div className="flex items-center gap-4">
+                            <button
+                              onClick={() => decreaseQty(item._id)}
+                              className="p-1 rounded hover:bg-gray-200"
+                            >
+                              <MinusIcon className="h-5 w-5" />
+                            </button>
+                            <p className="text-gray-500">{item.qty}</p>
+
+                            <button
+                              onClick={() => increaseQty(item._id)}
+                              className="p-1 rounded hover:bg-gray-200"
+                            >
+                              <PlusIcon className="h-5 w-5" />
+                            </button>
+                          </div>
+
                           <div className="flex">
                             <button
                               type="button"
                               className="font-medium text-indigo-600 hover:text-indigo-500"
-                              onClick={() => console.log("Remove", item.id)}
+                              onClick={() => removeFromCart(item._id)}
                             >
                               Remove
                             </button>

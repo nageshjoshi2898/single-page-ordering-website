@@ -12,7 +12,7 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
   const router = useRouter();
-  const { products, page, limit, setPage, total } = useProducts();
+  const { products, page, limit, setPage, total, addToCart } = useProducts();
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -60,7 +60,7 @@ export default function ProductsPage() {
           <ProductCard
             key={product._id}
             product={product}
-            onAddToCart={() => {}}
+            onAddToCart={addToCart}
           />
         ))}
       </div>
