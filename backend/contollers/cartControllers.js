@@ -1,5 +1,7 @@
 const Cart = require("../models/cartModel");
 const Product = require("../models/productModel");
+const connect_mongo = require("../db/db.js");
+
 exports.updateCart = async (req, res) => {
   const { userId } = req.params;
   const { items } = req.body;
@@ -9,6 +11,7 @@ exports.updateCart = async (req, res) => {
   }
 
   try {
+    await connect_mongo();
     const updatedCart = await Cart.findOneAndUpdate(
       { userId },
       { items, updatedAt: Date.now() },
@@ -23,6 +26,7 @@ exports.updateCart = async (req, res) => {
 exports.getCart = async (req, res) => {
   const { userId } = req.params;
   try {
+    await connect_mongo();
     const cart = await Cart.findOne({ userId });
 
     if (!cart || !cart.items.length) {

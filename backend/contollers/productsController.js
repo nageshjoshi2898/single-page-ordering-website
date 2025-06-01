@@ -1,5 +1,5 @@
 const Product = require("../models/productModel");
-
+const connect_mongo = require("../db/db.js");
 exports.listProducts = async (req, res) => {
   const q = req.query.q || "";
   const page = parseInt(req.query.page) || 1;
@@ -15,6 +15,8 @@ exports.listProducts = async (req, res) => {
     : {};
 
   try {
+    await connect_mongo();
+
     const skip = (page - 1) * limit;
 
     const products = await Product.find(filter).skip(skip).limit(limit);

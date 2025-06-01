@@ -1,11 +1,12 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
+const connect_mongo = require("../db/db.js");
 
 exports.signUp = async (req, res) => {
   const { email, password, name } = req.body;
-
   try {
+    await connect_mongo();
     const existing = await User.findOne({ email });
     if (existing)
       return res.status(400).json({ message: "User already exists" });
@@ -25,6 +26,7 @@ exports.signIn = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    await connect_mongo();
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
