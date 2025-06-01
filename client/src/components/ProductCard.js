@@ -4,16 +4,20 @@ import React, { useMemo } from "react";
 export default function ProductCard({ product, onAddToCart }) {
   const { cart, increaseQty, decreaseQty } = useProducts();
 
-  const cartItem = useMemo(() => {
-    return cart.find((item) => item._id === product._id);
-  }, [cart], product._id);
+  const cartItem = useMemo(
+    () => {
+      return cart.find((item) => item._id === product._id);
+    },
+    [cart],
+    product._id
+  );
 
   return (
     <article className="max-w-sm w-full bg-white rounded-lg shadow-lg overflow-hidden dark:bg-gray-700">
       <div>
         <img
           className="object-cover h-64 w-full"
-          src={product["Image Src"]}
+          src={product["Image Src"] || "./fall-back.png"}
           alt={product.Title}
         />
       </div>

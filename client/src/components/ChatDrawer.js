@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
+import { getToken } from "@/lib/localStore";
+import { useProducts } from "@/app/context/ProductContext";
 
 export default function ChatDrawer({ open, onClose }) {
   const [chatInput, setChatInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
-  const [page, setPage] = useState(1);
 
-  const handleChatSubmit = (e) => {
+  const { addToCart, cart, increaseQty, decreaseQty } = useProducts();
+  const handleChatSubmit = async (e) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
 
@@ -16,25 +18,49 @@ export default function ChatDrawer({ open, onClose }) {
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
     setChatInput("");
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+    try {
+      const res = await fetch(`${baseURL}/products/query`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify({ prompt: chatInput }),
+      });
 
-    // Simulate AI response and product fetch
-    setTimeout(() => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch products");
+      }
+
+      const data = await res.json();
+
       const assistantMessage = {
         role: "assistant",
         content: `Showing results for: "${chatInput}"`,
       };
 
-      const mockProducts = Array.from({ length: 50 }, (_, i) => ({
-        id: `prod-${i + 1 + (page - 1) * 5}`,
-        title: `Product ${i + 1 + (page - 1) * 5}`,
-        image: "https://via.placeholder.com/100",
-        price: (Math.random() * 100).toFixed(2),
-      }));
+      // const formattedProducts = data.map((p) => ({
+      //   id: p._id,
+      //   title: p.Title,
+      //   image: p["Image Src"] || "https://via.placeholder.com/100",
+      //   price: p["Variant Price"] || 0,
+      // }));
 
       setMessages((prev) => [...prev, assistantMessage]);
-      setProducts(mockProducts);
+      setProducts(data);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Sorry, something went wrong while fetching products.",
+        },
+      ]);
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
   return (
@@ -136,22 +162,103 @@ export default function ChatDrawer({ open, onClose }) {
                   id="carousel"
                   className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth px-8"
                 >
-                  {products.map((product) => (
-                    <div
-                      key={product.id}
-                      className="min-w-[180px] flex-shrink-0 border rounded-lg p-3 flex flex-col items-center shadow-sm bg-white"
-                    >
-                      <img
-                        src={product.image}
-                        alt={product.title}
-                        className="h-24 w-24 object-cover rounded mb-2"
-                      />
-                      <p className="text-sm font-medium text-center">
-                        {product.title}
-                      </p>
-                      <p className="text-xs text-gray-500">${product.price}</p>
-                    </div>
-                  ))}
+                  {products.map((product) => {
+                    const cartItem = cart.find(
+                      (item) => item._id === product._id
+                    );
+                    return (
+                      <div
+                        key={product._id}
+                        className="w-[200px] h-[300px] flex-shrink-0 border rounded-lg p-3 flex flex-col items-center justify-between shadow-sm bg-white"
+                      >
+                        <img
+                          src={product["Image Src"] || "./fall-back.png"}
+                          alt={product.Title}
+                          className="h-24 w-24 object-cover rounded mb-2"
+                        />
+
+                        <div className="text-center">
+                          <p className="text-sm font-medium line-clamp-2">
+                            {product.Title || "Unknown"}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            ${product["Variant Price"]}
+                          </p>
+                        </div>
+
+                        <div className="mt-2 w-full border-t border-gray-200 pt-2">
+                          {!cartItem ? (
+                            <button
+                              onClick={() => addToCart(product)}
+                              className="w-full flex justify-between items-center font-bold cursor-pointer hover:underline text-gray-800"
+                            >
+                              <span className="text-base">Add to Cart</span>
+                              <svg
+                                className="h-6 w-6"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                />
+                              </svg>
+                            </button>
+                          ) : (
+                            <div className="flex items-center justify-between">
+                              <button
+                                onClick={() => decreaseQty(product._id)}
+                                className="p-1 rounded hover:bg-gray-200"
+                              >
+                                <svg
+                                  className="h-5 w-5"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M20 12H4"
+                                  />
+                                </svg>
+                              </button>
+
+                              <p className="text-base font-medium text-gray-800">
+                                {cartItem.qty}
+                              </p>
+
+                              <button
+                                onClick={() => increaseQty(product._id)}
+                                className="p-1 rounded hover:bg-gray-200"
+                              >
+                                <svg
+                                  className="h-5 w-5"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                  />
+                                </svg>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
                 <button
                   onClick={() =>
