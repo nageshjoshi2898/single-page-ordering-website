@@ -1,6 +1,8 @@
 "use client";
 
-import { getToken } from "@/lib/localStore";
+import useDebouncedCartSync from "@/customHooks/useDebounceCartSync";
+import { getToken, getUserID } from "@/lib/localStore";
+import { useRouter } from "next/navigation";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 
 const ProductContext = createContext();
@@ -15,7 +17,9 @@ export const ProductProvider = ({ children }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
   const [cart, setCart] = useState([]);
+  const router = useRouter();
 
+  useDebouncedCartSync(cart);
   const debounceTimeout = useRef(null);
 
   const debounce = (fn) => {
@@ -46,32 +50,101 @@ export const ProductProvider = ({ children }) => {
             Authorization: `Bearer ${token}`, // <-- add token here
           },
         });
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("userId");
+          router.replace("/login");
+        }
         const data = await res.json();
         setProducts(data?.products);
-        setTotalPages(data?.pages)
-        setTotal(data?.total)
+        setTotalPages(data?.pages);
+        setTotal(data?.total);
       } catch (err) {
         console.error("Fetch failed:", err);
         setProducts([]);
-        setTotal(0)
+        setTotal(0);
       } finally {
         setLoading(false);
       }
     };
-
     fetchProducts();
   }, [searchQuery, page, limit]);
 
+  useEffect(() => {
+    const fetchCart = async () => {
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+      try {
+        const res = await fetch(`${baseURL}/cart/${getUserID()}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch cart");
+
+        const data = await res.json(); // expected: { items: [ {id, name, price, qty, image} ] }
+
+        setCart(data.items);
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("userId");
+          router.replace("/login");
+        }
+      } catch (err) {
+        console.error("Fetch cart error:", err);
+      }
+    };
+
+    fetchCart();
+  }, []);
+
   const addToCart = (item) => {
-    setCart((prev) => [...prev, item]);
+    setCart((prevCart) => {
+      const existingItemIndex = prevCart.findIndex(
+        (cartItem) => cartItem._id === item._id
+      );
+
+      if (existingItemIndex !== -1) {
+        const updatedCart = [...prevCart];
+        updatedCart[existingItemIndex] = {
+          ...updatedCart[existingItemIndex],
+          qty: updatedCart[existingItemIndex].qty + 1,
+        };
+        return updatedCart;
+      } else {
+        return [...prevCart, { ...item, qty: 1 }];
+      }
+    });
   };
 
   const removeFromCart = (id) => {
-    setCart((prev) => prev.filter((p) => p.id !== id));
+    setCart((prev) => prev.filter((p) => p._id !== id));
   };
 
   const clearCart = () => {
     setCart([]);
+  };
+
+  const increaseQty = (itemId) => {
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item._id === itemId ? { ...item, qty: item.qty + 1 } : item
+      )
+    );
+  };
+
+  const decreaseQty = (itemId) => {
+    setCart(
+      (prevCart) =>
+        prevCart
+          .map((item) =>
+            item._id === itemId ? { ...item, qty: item.qty - 1 } : item
+          )
+          .filter((item) => item.qty > 0) // Remove item if qty becomes 0
+    );
   };
 
   return (
@@ -92,6 +165,8 @@ export const ProductProvider = ({ children }) => {
         setSearchQueryDebounced,
         setPageDebounced,
         setLimitDebounced,
+        decreaseQty,
+        increaseQty,
       }}
     >
       {children}

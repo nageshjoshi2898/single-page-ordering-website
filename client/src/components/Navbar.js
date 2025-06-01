@@ -2,7 +2,8 @@
 import { useState } from "react";
 import {
   ShoppingCartIcon,
-  ArrowRightEndOnRectangleIcon,
+  ChatBubbleBottomCenterIcon,
+  ArrowRightStartOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import CartDrawer from "./CartDrawer";
 import { useProducts } from "@/app/context/ProductContext";
@@ -28,6 +29,9 @@ export default function Navbar({ onSearch }) {
           />
         </div>
         <div className="flex items-center space-x-4">
+          <button onClick={() => {}} className="hover:text-blue-600">
+            <ChatBubbleBottomCenterIcon className="w-6 h-6 text-gray-700" />
+          </button>
           <button
             onClick={() => {
               setDrawerOpen(true);
@@ -39,17 +43,14 @@ export default function Navbar({ onSearch }) {
           </button>
           <button
             onClick={() => {
-              const token = localStorage.removeItem("token");
+              localStorage.removeItem("token");
+              localStorage.removeItem("userId");
               router.replace("/login");
             }}
             className="hover:text-blue-600"
           >
-            <ArrowRightEndOnRectangleIcon className="w-6 h-6 text-gray-700" />
+            <ArrowRightStartOnRectangleIcon className="w-6 h-6 text-gray-700" />
           </button>
-          {/* 
-        <button onClick={onLogoutClick} className="hover:text-blue-600">
-          <ChatBubbleBottomCenterIcon className="w-6 h-6 text-gray-700 rotate-180" />
-        </button> */}
         </div>
       </nav>
       <CartDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />

@@ -30,7 +30,7 @@ export default function LoginPage() {
   
       // Store token (adjust based on your API response)
       localStorage.setItem('token', data.token);
-  
+      localStorage.setItem('userId', data.user.id);
       // Redirect
       router.replace('/');
     } catch (err) {
