@@ -6,12 +6,14 @@ import {
   ArrowRightStartOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import CartDrawer from "./CartDrawer";
+import ChatDrawer from "./ChatDrawer";
 import { useProducts } from "@/app/context/ProductContext";
 import { useRouter } from "next/navigation";
 
 export default function Navbar({ onSearch }) {
   const router = useRouter();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
   const { setSearchQueryDebounced } = useProducts();
   return (
     <>
@@ -29,13 +31,17 @@ export default function Navbar({ onSearch }) {
           />
         </div>
         <div className="flex items-center space-x-4">
-          <button onClick={() => {}} className="hover:text-blue-600">
+          <button
+            onClick={() => {
+              setChatDrawerOpen(true);
+            }}
+            className="cursor-pointer hover:text-blue-600"
+          >
             <ChatBubbleBottomCenterIcon className="w-6 h-6 text-gray-700" />
           </button>
           <button
             onClick={() => {
               setDrawerOpen(true);
-              console.log("Show");
             }}
             className="cursor-pointer hover:text-blue-600"
           >
@@ -47,13 +53,17 @@ export default function Navbar({ onSearch }) {
               localStorage.removeItem("userId");
               router.replace("/login");
             }}
-            className="hover:text-blue-600"
+            className="cursor-pointer hover:text-blue-600"
           >
             <ArrowRightStartOnRectangleIcon className="w-6 h-6 text-gray-700" />
           </button>
         </div>
       </nav>
       <CartDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <ChatDrawer
+        open={chatDrawerOpen}
+        onClose={() => setChatDrawerOpen(false)}
+      />
     </>
   );
 }
