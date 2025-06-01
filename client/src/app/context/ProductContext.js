@@ -104,7 +104,7 @@ export const ProductProvider = ({ children }) => {
   const addToCart = (item) => {
     setCart((prevCart) => {
       const existingItemIndex = prevCart.findIndex(
-        (cartItem) => cartItem.id === item.id
+        (cartItem) => cartItem._id === item._id
       );
 
       if (existingItemIndex !== -1) {

@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SignupPage() {
   const router = useRouter();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -18,12 +18,25 @@ export default function SignupPage() {
       return;
     }
 
-    // Dummy register — Replace with actual API call
     const userData = { name, email, password };
-    console.log('Registering user:', userData);
+    console.log("Registering user:", userData);
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+    try {
+      const res = await fetch(`${baseURL}/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    localStorage.setItem('token', 'dummy-token');
-    router.replace('/products');
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Signup failed");
+      }
+      router.replace("/login");
+    } catch (error) {}
   };
 
   return (
@@ -42,7 +55,10 @@ export default function SignupPage() {
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-900"
+            >
               Full Name
             </label>
             <div className="mt-2">
@@ -59,7 +75,10 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-900"
+            >
               Email address
             </label>
             <div className="mt-2">
@@ -77,7 +96,10 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-900"
+            >
               Password
             </label>
             <div className="mt-2">
@@ -95,7 +117,10 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="confirm-password"
+              className="block text-sm font-medium text-gray-900"
+            >
               Confirm Password
             </label>
             <div className="mt-2">
@@ -122,8 +147,11 @@ export default function SignupPage() {
         </form>
 
         <p className="mt-10 text-center text-sm text-gray-500">
-          Already a member?{' '}
-          <a href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
+          Already a member?{" "}
+          <a
+            href="/login"
+            className="font-semibold text-indigo-600 hover:text-indigo-500"
+          >
             Sign in
           </a>
         </p>

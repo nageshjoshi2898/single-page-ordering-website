@@ -1,6 +1,9 @@
 import React from "react";
 import { useProducts } from "@/app/context/ProductContext";
-import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
+import {
+  MinusIcon,
+  PlusIcon
+} from "@heroicons/react/24/outline";
 
 export default function CartDrawer({ open, onClose }) {
   const { cart, removeFromCart, decreaseQty, increaseQty } = useProducts();
