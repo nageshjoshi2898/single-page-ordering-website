@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
       >
         <ProductProvider>{children}</ProductProvider>
         <div className="fixed bottom-1 right-1 bg-black/70 text-white text-xs px-3 py-1 rounded z-50">
-          v1.0
+          v1.1
         </div>
       </body>
     </html>
