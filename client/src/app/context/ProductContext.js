@@ -1,7 +1,8 @@
 "use client";
 
 import useDebouncedCartSync from "@/customHooks/useDebounceCartSync";
-import { getToken } from "@/lib/localStore";
+import { getToken, getUserID } from "@/lib/localStore";
+import { useRouter } from "next/navigation";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 
 const ProductContext = createContext();
@@ -15,8 +16,9 @@ export const ProductProvider = ({ children }) => {
   const [limit, setLimit] = useState(20);
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
-  const [cart, setCart] =  useState([]);
-  
+  const [cart, setCart] = useState([]);
+  const router = useRouter();
+
   useDebouncedCartSync(cart);
   const debounceTimeout = useRef(null);
 
@@ -48,6 +50,11 @@ export const ProductProvider = ({ children }) => {
             Authorization: `Bearer ${token}`, // <-- add token here
           },
         });
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("userId");
+          router.replace("/login");
+        }
         const data = await res.json();
         setProducts(data?.products);
         setTotalPages(data?.pages);
@@ -60,9 +67,40 @@ export const ProductProvider = ({ children }) => {
         setLoading(false);
       }
     };
-
     fetchProducts();
   }, [searchQuery, page, limit]);
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+      try {
+        const res = await fetch(`${baseURL}/cart/${getUserID()}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch cart");
+
+        const data = await res.json(); // expected: { items: [ {id, name, price, qty, image} ] }
+
+        setCart(data.items);
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("userId");
+          router.replace("/login");
+        }
+      } catch (err) {
+        console.error("Fetch cart error:", err);
+      }
+    };
+
+    fetchCart();
+  }, []);
+
   const addToCart = (item) => {
     setCart((prevCart) => {
       const existingItemIndex = prevCart.findIndex(

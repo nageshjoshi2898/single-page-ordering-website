@@ -39,7 +39,8 @@ export default function Navbar({ onSearch }) {
           </button>
           <button
             onClick={() => {
-              const token = localStorage.removeItem("token");
+              localStorage.removeItem("token");
+              localStorage.removeItem("userId");
               router.replace("/login");
             }}
             className="hover:text-blue-600"
