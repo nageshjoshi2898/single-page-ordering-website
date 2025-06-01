@@ -30,7 +30,7 @@ export default function ProductCard({ product, onAddToCart }) {
           {product.description}
         </span>
         <span className="font-semibold text-gray-800 dark:text-gray-50">
-          ${product["Variant Price"]}
+          ${product["Variant Price"] || 0}
         </span>
         <span className="font-semibold text-gray-800 dark:text-gray-50">
           Vairant SKU {product["Variant SKU"]}
