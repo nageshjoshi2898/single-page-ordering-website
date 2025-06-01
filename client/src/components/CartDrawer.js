@@ -1,9 +1,6 @@
 import React from "react";
 import { useProducts } from "@/app/context/ProductContext";
-import {
-  MinusIcon,
-  PlusIcon
-} from "@heroicons/react/24/outline";
+import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 export default function CartDrawer({ open, onClose }) {
   const { cart, removeFromCart, decreaseQty, increaseQty } = useProducts();
@@ -78,10 +75,13 @@ export default function CartDrawer({ open, onClose }) {
                         <div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                             <h3>
-                              <a href="#">{item.Title}</a>
+                              <a href="#">{item.Title || "Unknown"}</a>
                             </h3>
                             <p className="ml-4">
-                              ${item["Variant Price"].toFixed(2)}
+                              $
+                              {item["Variant Price"]
+                                ? item["Variant Price"].toFixed(2)
+                                : 0}
                             </p>
                           </div>
                           <p className="mt-1 text-sm text-gray-500">

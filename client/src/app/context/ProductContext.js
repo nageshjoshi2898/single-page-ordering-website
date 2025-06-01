@@ -80,6 +80,12 @@ export const ProductProvider = ({ children }) => {
   useEffect(() => {
     const fetchCart = async () => {
       try {
+        if (!userId) {
+          let usrId = getUserID();
+          if (!usrId) {
+            return;
+          }
+        }
         const res = await fetch(`${baseURL}/cart/${getUserID()}`, {
           method: "GET",
           headers: {
@@ -104,7 +110,7 @@ export const ProductProvider = ({ children }) => {
     };
 
     fetchCart();
-  }, []);
+  }, [userId]);
 
   const addToCart = (item) => {
     setCart((prevCart) => {
