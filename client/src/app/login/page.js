@@ -2,37 +2,41 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useProducts } from "../context/ProductContext";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { baseURL } from "@/lib/base";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { setUserId } = useProducts();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
     try {
       const response = await fetch(`${baseURL}/auth/signin`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
-  
+
       if (!response.ok) {
-        throw new Error('Invalid credentials');
+        throw new Error("Invalid credentials");
       }
-  
+
       const data = await response.json();
-  
+
       // Store token (adjust based on your API response)
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userId', data.user.id);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.user.id);
+      setUserId(data.user.id);
       // Redirect
-      router.replace('/');
+      router.replace("/");
     } catch (err) {
       alert(err.message);
     }
@@ -83,17 +87,28 @@ export default function LoginPage() {
                 Password
               </label>
             </div>
-            <div className="mt-2">
+            <div className="mt-2 relative">
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              >
+                {showPassword ? (
+                  <EyeSlashIcon className="h-5 w-5" />
+                ) : (
+                  <EyeIcon className="h-5 w-5" />
+                )}
+              </button>
             </div>
           </div>
 

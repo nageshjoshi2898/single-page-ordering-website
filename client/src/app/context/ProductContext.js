@@ -1,6 +1,7 @@
 "use client";
 
 import useDebouncedCartSync from "@/customHooks/useDebounceCartSync";
+import { baseURL } from "@/lib/base";
 import { getToken, getUserID } from "@/lib/localStore";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
@@ -17,6 +18,7 @@ export const ProductProvider = ({ children }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
   const [cart, setCart] = useState([]);
+  const [userId, setUserId] = useState(null);
   const router = useRouter();
 
   useDebouncedCartSync(cart);
@@ -32,9 +34,13 @@ export const ProductProvider = ({ children }) => {
   const setLimitDebounced = (l) => debounce(() => setLimit(l));
 
   useEffect(() => {
-    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
     const fetchProducts = async () => {
+      if (!userId) {
+        let usrId = getUserID();
+        if (!usrId) {
+          return;
+        }
+      }
       setLoading(true);
       try {
         const params = new URLSearchParams({
@@ -54,6 +60,7 @@ export const ProductProvider = ({ children }) => {
           localStorage.removeItem("token");
           localStorage.removeItem("userId");
           router.replace("/login");
+          setUserId(null);
         }
         const data = await res.json();
         setProducts(data?.products);
@@ -68,12 +75,10 @@ export const ProductProvider = ({ children }) => {
       }
     };
     fetchProducts();
-  }, [searchQuery, page, limit]);
+  }, [searchQuery, page, limit, userId]);
 
   useEffect(() => {
     const fetchCart = async () => {
-      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
       try {
         const res = await fetch(`${baseURL}/cart/${getUserID()}`, {
           method: "GET",
@@ -167,6 +172,7 @@ export const ProductProvider = ({ children }) => {
         setLimitDebounced,
         decreaseQty,
         increaseQty,
+        setUserId,
       }}
     >
       {children}

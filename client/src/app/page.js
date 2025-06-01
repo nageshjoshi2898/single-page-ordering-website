@@ -16,6 +16,8 @@ export default function ProductsPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
       router.replace("/login");
     } else {
       setAuthorized(true);

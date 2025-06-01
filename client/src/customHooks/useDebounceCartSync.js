@@ -1,3 +1,4 @@
+import { baseURL } from "@/lib/base";
 import { getToken } from "@/lib/localStore";
 import { useEffect, useRef } from "react";
 
@@ -7,7 +8,6 @@ const useDebouncedCartSync = (cart) => {
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     if (!userId || !cart) return;
-    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     clearTimeout(timeoutRef.current);
     const token = getToken();
