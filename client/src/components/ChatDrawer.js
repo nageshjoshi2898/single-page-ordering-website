@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
 import { getToken } from "@/lib/localStore";
 import { useProducts } from "@/app/context/ProductContext";
+import { baseURL } from "@/lib/base";
 
 export default function ChatDrawer({ open, onClose }) {
   const [chatInput, setChatInput] = useState("");
@@ -18,7 +19,6 @@ export default function ChatDrawer({ open, onClose }) {
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
     setChatInput("");
-    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
     try {
       const res = await fetch(`${baseURL}/products/query`, {
         method: "POST",
