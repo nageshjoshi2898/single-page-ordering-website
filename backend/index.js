@@ -19,7 +19,7 @@ app.use(
 );
 // Routes
 app.get("/", (req, res) => {
-  res.send("Backend is deployed and running ✅");
+  res.send("Backend is deployed and running ✅ v1.1");
 });
 
 app.use("/api/auth", authRoutes);
