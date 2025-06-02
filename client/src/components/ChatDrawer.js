@@ -74,7 +74,7 @@ export default function ChatDrawer({ open, onClose }) {
       )}
 
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-3/4 transform transition-transform duration-500 ease-in-out bg-white shadow-xl ${
+        className={`fixed inset-y-0 right-0 z-50 w-screen md:w-3/4 transform transition-transform duration-500 ease-in-out bg-white shadow-xl ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
