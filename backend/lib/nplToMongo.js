@@ -9,6 +9,9 @@ Schema fields include:
 - Tags (string)
 - Type (string)
 - Image Src (string)
+- Variant SKU (string)
+- Variant Inventory Qty (string),
+
 Only return a valid JSON object with filter keys. No explanation or markdown.
 `;
 
